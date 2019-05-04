@@ -1,7 +1,7 @@
-import tornado.web
+from Application.MyBaseHandler import MyBaseHandler
 
 
-class MainHandler(tornado.web.RequestHandler):
+class MainHandler(MyBaseHandler):
     def data_received(self, chunk):
         pass
 

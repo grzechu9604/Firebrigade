@@ -1,8 +1,7 @@
-import tornado
+from Application.MyBaseHandler import MyBaseHandler
 
 
-class VehiclesHandler(tornado.web.RequestHandler):
-    @tornado.web.removeslash
+class VehiclesHandler(MyBaseHandler):
     def get(self, vehicle_id=""):
         if len(vehicle_id) > 0:
             self.write("VehiclesHandler GET vehicle_id: " + vehicle_id)

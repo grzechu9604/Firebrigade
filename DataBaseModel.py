@@ -1,9 +1,10 @@
-import os
-import sys
+import json
 from sqlalchemy import Column, ForeignKey, Integer, String, Date, Boolean, DateTime, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+
+from Helpers.SerializationHelper import SerializationHelper
 
 Base = declarative_base()
 
@@ -41,6 +42,22 @@ class Firefighter(Person):
     is_active = Column(Boolean, nullable=False)
     person_id = Column(Integer, ForeignKey('People.id'), primary_key=True)
     person = relationship(Person)
+
+    def to_list_json(self):
+        sh = SerializationHelper()
+        sh.name = self.name
+        sh.last_name = self.last_name
+        sh.id = self.id
+        sh.link = "~/firefighters/" + str(self.id)
+        return sh.to_json()
+
+    def to_full_json(self):
+        sh = SerializationHelper()
+        sh.name = self.name
+        sh.last_name = self.last_name
+        sh.id = self.id
+        sh.birth_date = self.birth_date
+        return sh.to_json()
 
 
 class Alert(Base):

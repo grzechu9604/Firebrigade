@@ -1,9 +1,8 @@
-import tornado
 from tornado.httpclient import HTTPError
+from Application.MyBaseHandler import MyBaseHandler
 
 
-class FirefightersAlertsHandler(tornado.web.RequestHandler):
-    @tornado.web.removeslash
+class FirefightersAlertsHandler(MyBaseHandler):
     def get(self, firefighter_id="", alert_id=""):
         if len(firefighter_id) > 0:
             if len(alert_id) > 0:

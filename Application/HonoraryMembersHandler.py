@@ -1,8 +1,7 @@
-import tornado
+from Application.MyBaseHandler import MyBaseHandler
 
 
-class HonoraryMembersHandler(tornado.web.RequestHandler):
-    @tornado.web.removeslash
+class HonoraryMembersHandler(MyBaseHandler):
     def get(self, member_id=""):
         if len(member_id) > 0:
             self.write("HonoraryMembersHandler GET member_id: " + member_id)
