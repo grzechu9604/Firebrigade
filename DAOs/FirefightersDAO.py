@@ -32,6 +32,7 @@ class FirefightersDAO:
         else:
             firefighter.is_active = False
             self.connector.session.add(firefighter)
+            self.connector.session.commit()
             return True
 
     def create_firefighter(self, name, last_name, birth_date):
@@ -41,6 +42,7 @@ class FirefightersDAO:
         try:
             firefighter = Firefighter(name=name, last_name=last_name, birth_date=birth_date, is_active=True)
             self.add(firefighter)
+            self.connector.session.commit()
             return True
         except:
             return False
@@ -60,6 +62,7 @@ class FirefightersDAO:
             firefighter.birth_date = birth_date
 
         DBConnector.session.add(firefighter)
+        self.connector.session.commit()
         return True
 
     def update_firefighter_fully(self, firefighter_id, name, last_name, birth_date):
@@ -72,4 +75,5 @@ class FirefightersDAO:
         firefighter.birth_date = birth_date
 
         DBConnector.session.add(firefighter)
+        self.connector.session.commit()
         return True
