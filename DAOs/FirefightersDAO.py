@@ -1,5 +1,3 @@
-from typing import Optional, Any
-
 from DAOs.DBConnector import DBConnector
 from DataBaseModel import Firefighter
 
