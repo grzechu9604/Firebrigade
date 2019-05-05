@@ -1,8 +1,8 @@
-import tornado
 import json
+from tornado import web
 
 
-class MyBaseHandler(tornado.web.RequestHandler):
+class MyBaseHandler(web.RequestHandler):
 
     def write_error(self, status_code, **kwargs):
         self.set_header('Content-Type', 'application/json')

@@ -1,3 +1,5 @@
+from typing import Optional, Any
+
 from DAOs.DBConnector import DBConnector
 from DataBaseModel import Firefighter
 
@@ -19,8 +21,18 @@ class FirefightersDAO:
         return "[" + str.join(",", [a.to_list_json() for a in all_firefighters]) + "]"
 
     def get_full_in_json(self, firefighter_id):
-        firefighter = self.get(firefighter_id)
+        firefighter: Firefighter = self.get(firefighter_id)
         if firefighter is not None:
             return firefighter.to_full_json()
         else:
             return None
+
+    def deactivate_firefighter(self, firefighter_id):
+        firefighter: Firefighter = self.get(firefighter_id)
+        if firefighter is None or firefighter.is_active is False:
+            return False
+        else:
+            firefighter.is_active = False
+            self.connector.session.add(firefighter)
+            return True
+
