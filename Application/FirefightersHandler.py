@@ -17,22 +17,42 @@ class FirefightersHandler(MyBaseHandler):
         if len(firefighter_id) > 0:
             raise HTTPError(405)
         else:
-            #dodanie strażaka
-            raise NotImplemented
+            dao = FirefightersDAO.FirefightersDAO()
+            success = dao.create_firefighter(self.get_argument("name"), self.get_argument("last_name"),
+                                             self.get_argument("birth_date", None))
+            if success:
+                self.set_status(201)
+                self.finish()
+            else:
+                raise HTTPError(403)
 
     def put(self, firefighter_id=""):
         if len(firefighter_id) == 0:
             raise HTTPError(405)
         else:
-            #edycja strażaka jeżeli istniał
-            raise NotImplemented
+            dao = FirefightersDAO.FirefightersDAO()
+            success = dao.update_firefighter_fully(firefighter_id, self.get_argument("name"),
+                                                   self.get_argument("last_name"),
+                                                   self.get_argument("birth_date", None))
+            if success:
+                self.set_status(200)
+                self.finish()
+            else:
+                raise HTTPError(404)
 
     def patch(self, firefighter_id=""):
         if len(firefighter_id) == 0:
             raise HTTPError(405)
         else:
-            #edycja strażaka jeżeli istniał
-            raise NotImplemented
+            dao = FirefightersDAO.FirefightersDAO()
+            success = dao.update_firefighter_partially(firefighter_id, self.get_argument("name", None),
+                                                       self.get_argument("last_name", None),
+                                                       self.get_argument("birth_date", None))
+            if success:
+                self.set_status(200)
+                self.finish()
+            else:
+                raise HTTPError(404)
 
     def delete(self, firefighter_id=""):
         if len(firefighter_id) == 0:
