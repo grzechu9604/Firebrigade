@@ -111,6 +111,23 @@ class Vehicle(Base):
     seats_amount = Column(Integer, nullable=False)
     alerts = relationship("Alert", secondary=alerts_vehicles, back_populates="vehicles")
 
+    def to_list_json(self):
+        sh = SerializationHelper()
+        sh.type = self.type
+        sh.name = self.name
+        sh.id = self.id
+        sh.link = "~/vehicles/" + str(self.id)
+        return sh.to_json()
+
+    def to_full_json(self):
+        sh = SerializationHelper()
+        sh.type = self.type
+        sh.name = self.name
+        sh.id = self.id
+        sh.description = self.description
+        sh.seats_amount = self.seats_amount
+        return sh.to_json()
+
 
 # Create an engine that stores data in the local directory's
 # sqlalchemy_example.db file.
