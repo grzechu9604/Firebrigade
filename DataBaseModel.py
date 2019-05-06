@@ -35,6 +35,22 @@ class HonoraryMember(Person):
     person_id = Column(Integer, ForeignKey('People.id'), primary_key=True)
     person = relationship(Person)
 
+    def to_list_json(self):
+        sh = SerializationHelper()
+        sh.name = self.name
+        sh.last_name = self.last_name
+        sh.id = self.id
+        sh.link = "~/honoraryMembers/" + str(self.id)
+        return sh.to_json()
+
+    def to_full_json(self):
+        sh = SerializationHelper()
+        sh.name = self.name
+        sh.last_name = self.last_name
+        sh.id = self.id
+        sh.birth_date = self.birth_date
+        return sh.to_json()
+
 
 class Firefighter(Person):
     __tablename__ = 'Firefighters'

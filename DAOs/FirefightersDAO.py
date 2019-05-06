@@ -79,7 +79,7 @@ class FirefightersDAO:
         firefighter.name = name
         firefighter.last_name = last_name
         if birth_date_str is not None and len(birth_date_str) > 0:
-            firefighter.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').timestamp()
+            firefighter.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d')
         else:
             firefighter.birth_date = None
 
