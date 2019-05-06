@@ -69,6 +69,21 @@ class Alert(Base):
     persons = relationship("Person", secondary=alerts_people, back_populates="alerts")
     vehicles = relationship("Vehicle", secondary=alerts_vehicles, back_populates="alerts")
 
+    def to_list_json(self):
+        sh = SerializationHelper()
+        sh.timestamp = self.timestamp
+        sh.reason = self.reason
+        sh.id = self.id
+        sh.link = "~/alerts/" + str(self.id)
+        return sh.to_json()
+
+    def to_full_json(self):
+        sh = SerializationHelper()
+        sh.timestamp = self.timestamp
+        sh.reason = self.reason
+        sh.id = self.id
+        return sh.to_json()
+
 
 class Vehicle(Base):
     __tablename__ = 'Vehicles'

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from DAOs.DBConnector import DBConnector
 from DataBaseModel import Firefighter
 
@@ -35,11 +37,15 @@ class FirefightersDAO:
             self.connector.session.commit()
             return True
 
-    def create_firefighter(self, name, last_name, birth_date):
+    def create_firefighter(self, name, last_name, birth_date_str):
         if name is None or last_name is None or len(name) == 0 or len(last_name) == 0:
             return False
 
         try:
+            birth_date = None
+            if birth_date_str is not None and len(birth_date_str) > 0:
+                birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d')
+
             firefighter = Firefighter(name=name, last_name=last_name, birth_date=birth_date, is_active=True)
             self.add(firefighter)
             self.connector.session.commit()
@@ -47,7 +53,7 @@ class FirefightersDAO:
         except:
             return False
 
-    def update_firefighter_partially(self, firefighter_id, name, last_name, birth_date):
+    def update_firefighter_partially(self, firefighter_id, name, last_name, birth_date_str):
         firefighter: Firefighter = self.get(firefighter_id)
         if firefighter is None or firefighter.is_active is False:
             return False
@@ -58,21 +64,24 @@ class FirefightersDAO:
         if last_name is not None and len(last_name) > 0:
             firefighter.last_name = last_name
 
-        if birth_date is not None:
-            firefighter.birth_date = birth_date
+        if birth_date_str is not None and len(birth_date_str) > 0:
+            firefighter.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d')
 
         DBConnector.session.add(firefighter)
         self.connector.session.commit()
         return True
 
-    def update_firefighter_fully(self, firefighter_id, name, last_name, birth_date):
+    def update_firefighter_fully(self, firefighter_id, name, last_name, birth_date_str):
         firefighter: Firefighter = self.get(firefighter_id)
         if firefighter is None or firefighter.is_active is False:
             return False
 
         firefighter.name = name
         firefighter.last_name = last_name
-        firefighter.birth_date = birth_date
+        if birth_date_str is not None and len(birth_date_str) > 0:
+            firefighter.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').timestamp()
+        else:
+            firefighter.birth_date = None
 
         DBConnector.session.add(firefighter)
         self.connector.session.commit()
