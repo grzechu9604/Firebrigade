@@ -1,6 +1,6 @@
 from tornado.httpclient import HTTPError
 from Application.MyBaseHandler import MyBaseHandler
-from Controllers.FirefightersController import FirefighterController
+from Controllers.FirefightersAlertsController import FirefightersAlertsController
 from Exceptions.Exceptions import ObjectAlreadyExistsInCollectionException, ObjectNotFoundInCollectionException
 
 
@@ -11,7 +11,7 @@ class FirefightersAlertsHandler(MyBaseHandler):
             if len(alert_id) > 0:
                 self.write("FirefightersAlertsHandler GET firefighter_id: " + firefighter_id + "alert_id: " + alert_id)
             else:
-                controller = FirefighterController()
+                controller = FirefightersAlertsController()
                 self.write(controller.get_firefighter_alerts_info(int(firefighter_id)))
 
         else:
@@ -22,7 +22,7 @@ class FirefightersAlertsHandler(MyBaseHandler):
         if len(firefighter_id) == 0 or len(alert_id) > 0:
             raise HTTPError(405)
         else:
-            controller = FirefighterController()
+            controller = FirefightersAlertsController()
             try:
                 controller.assign_firefighter_to_alert(int(firefighter_id), int(alert_id))
                 self.set_status(201)
@@ -38,7 +38,7 @@ class FirefightersAlertsHandler(MyBaseHandler):
 
     def delete(self, firefighter_id="", alert_id=""):
         if len(firefighter_id) > 0 and len(alert_id) > 0:
-            controller = FirefighterController()
+            controller = FirefightersAlertsController()
             try:
                 controller.discharge_firefighter_from_alert(int(firefighter_id), int(alert_id))
                 self.set_status(204)

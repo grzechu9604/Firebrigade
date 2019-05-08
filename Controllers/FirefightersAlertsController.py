@@ -3,7 +3,7 @@ from DAOs.AlertsDAO import AlertsDAO
 from Exceptions.Exceptions import ObjectAlreadyExistsInCollectionException, ObjectNotFoundInCollectionException
 
 
-class FirefighterController:
+class FirefightersAlertsController:
     firefighters_dao = FirefightersDAO()
     alerts_dao = AlertsDAO()
 

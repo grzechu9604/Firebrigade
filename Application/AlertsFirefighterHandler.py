@@ -1,6 +1,6 @@
 from tornado.httpclient import HTTPError
 from Application.MyBaseHandler import MyBaseHandler
-from Controllers.FirefightersController import FirefighterController
+from Controllers.FirefightersAlertsController import FirefightersAlertsController
 
 
 class AlertsFirefightersHandler(MyBaseHandler):
@@ -9,7 +9,7 @@ class AlertsFirefightersHandler(MyBaseHandler):
             if len(firefighter_id) > 0:
                 self.write("AlertsFirefightersHandler GET alert_id: " + alert_id + "firefighter_id: " + firefighter_id)
             else:
-                controller = FirefighterController()
+                controller = FirefightersAlertsController()
                 self.write(controller.get_firefighters_assigned_to_alert_info(int(alert_id)))
         else:
             raise HTTPError(405)
