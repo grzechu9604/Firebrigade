@@ -35,8 +35,6 @@ class FirefightersHandler(MyBaseHandler):
                 self.finish()
             except ValueError:
                 raise HTTPError(405)
-            except ObjectNotFoundInDBException:
-                raise HTTPError(404)
 
     def put(self, firefighter_id=""):
         if len(firefighter_id) == 0:

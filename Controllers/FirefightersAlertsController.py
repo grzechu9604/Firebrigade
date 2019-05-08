@@ -1,18 +1,18 @@
+from Controllers.AlertsController import AlertsController
 from Controllers.FirefightersController import FirefightersController
 from DAOs.DBConnector import DBConnector
-from DAOs.AlertsDAO import AlertsDAO
 from Exceptions.Exceptions import ObjectAlreadyExistsInCollectionException, ObjectNotFoundInCollectionException
 
 
 class FirefightersAlertsController:
-    alerts_dao = AlertsDAO()
+    alerts_controller = AlertsController()
     firefighters_controller = FirefightersController()
     db_connector = DBConnector()
 
     def assign_firefighter_to_alert(self, firefighter_id: int, alert_id: int) -> None:
         if isinstance(firefighter_id, int) and isinstance(alert_id, int):
             firefighter = self.firefighters_controller.get_active_firefighter(firefighter_id)
-            alert = self.alerts_dao.get(alert_id)
+            alert = self.alerts_controller.get_alert(alert_id)
 
             if not any(alert.id == a.id for a in firefighter.alerts):
                 firefighter.alerts.append(alert)
@@ -27,7 +27,7 @@ class FirefightersAlertsController:
     def discharge_firefighter_from_alert(self, firefighter_id: int, alert_id: int) -> None:
         if isinstance(firefighter_id, int) and isinstance(alert_id, int):
             firefighter = self.firefighters_controller.get_firefighter(firefighter_id)
-            alert = self.alerts_dao.get(alert_id)
+            alert = self.alerts_controller.get_alert(alert_id)
 
             if any(alert.id == a.id for a in firefighter.alerts):
                 firefighter.alerts.remove(alert)
@@ -41,7 +41,7 @@ class FirefightersAlertsController:
 
     def get_firefighters_assigned_to_alert_info(self, alert_id: int) -> str:
         if isinstance(alert_id, int):
-            alert = self.alerts_dao.get(alert_id)
+            alert = self.alerts_controller.get_alert(alert_id)
             return "[{0}]".format(str.join(",", [f.to_list_json() for f in alert.persons]))
         else:
             self.db_connector.rollback_session()
