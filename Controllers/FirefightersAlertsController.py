@@ -1,10 +1,12 @@
 from Controllers.AlertsController import AlertsController
 from Controllers.FirefightersController import FirefightersController
 from DAOs.DBConnector import DBConnector
-from Exceptions.Exceptions import ObjectAlreadyExistsInCollectionException, ObjectNotFoundInCollectionException
+from DataBaseModel import Firefighter, Alert, Person
+from Exceptions.Exceptions import ObjectAlreadyExistsInCollectionException, ObjectNotFoundInCollectionException, \
+    ObjectNotFoundInDBException
 
 
-class FirefightersAlertsController:
+class FirefightersAlertsController():
     alerts_controller = AlertsController()
     firefighters_controller = FirefightersController()
     db_connector = DBConnector()
@@ -53,4 +55,38 @@ class FirefightersAlertsController:
             return "[{0}]".format(str.join(",", [a.to_list_json() for a in firefighter.alerts]))
         else:
             self.db_connector.rollback_session()
+            raise ValueError
+
+    def get_alert_info(self, firefighter_id: int, alert_id: int) -> str:
+        return self.get_alert_connected_to_firefighter(int(alert_id), int(firefighter_id)).to_full_json()
+
+    def get_firefighter_info(self, alert_id: int, firefighter_id: int) -> str:
+        return self.get_firefighter_connected_to_alert(int(alert_id), int(firefighter_id)).to_full_json()
+
+    def get_alert_connected_to_firefighter(self, alert_id: int, firefighter_id: int) -> Alert:
+        if isinstance(firefighter_id, int) and isinstance(alert_id, int):
+            firefighter = self.firefighters_controller.get_firefighter(firefighter_id)
+            if firefighter is None:
+                raise ObjectNotFoundInDBException
+
+            alert = next((a for a in firefighter.alerts if a.id == alert_id), None)
+            if alert is None:
+                raise ObjectNotFoundInDBException
+
+            return alert
+        else:
+            raise ValueError
+
+    def get_firefighter_connected_to_alert(self, alert_id: int, firefighter_id: int) -> Person:
+        if isinstance(firefighter_id, int) and isinstance(alert_id, int):
+            alert = self.alerts_controller.get_alert(alert_id)
+            if alert is None:
+                raise ObjectNotFoundInDBException
+
+            firefighter = next((p for p in alert.persons if p.id == firefighter_id), None)
+            if firefighter is None:
+                raise ObjectNotFoundInDBException
+
+            return firefighter
+        else:
             raise ValueError

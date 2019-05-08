@@ -17,14 +17,14 @@ class AlertsDAO:
         try:
             self.connector.add_to_db(alert)
             self.connector.session.commit()
-        except Exception as e:
+        except Exception:
             self.connector.session.rollback()
-            raise e
+            raise
 
     def delete_alert(self, alert: Alert) -> None:
         try:
             self.connector.session.delete(alert)
             self.connector.session.commit()
-        except Exception as e:
+        except Exception:
             self.connector.session.rollback()
-            raise e
+            raise

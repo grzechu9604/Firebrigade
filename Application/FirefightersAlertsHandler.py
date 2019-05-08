@@ -1,29 +1,34 @@
-from tornado.httpclient import HTTPError
+from tornado.web import HTTPError
 from Application.MyBaseHandler import MyBaseHandler
 from Controllers.FirefightersAlertsController import FirefightersAlertsController
-from Exceptions.Exceptions import ObjectAlreadyExistsInCollectionException, ObjectNotFoundInCollectionException
+from Exceptions.Exceptions import ObjectAlreadyExistsInCollectionException, ObjectNotFoundInCollectionException, \
+    ObjectNotFoundInDBException
 
 
 class FirefightersAlertsHandler(MyBaseHandler):
     def get(self, firefighter_id="", alert_id=""):
         if len(firefighter_id) > 0:
             self.set_header('Content-Type', 'application/json')
-            if len(alert_id) > 0:
-                self.write("FirefightersAlertsHandler GET firefighter_id: " + firefighter_id + "alert_id: " + alert_id)
-            else:
-                controller = FirefightersAlertsController()
-                self.write(controller.get_firefighter_alerts_info(int(firefighter_id)))
-
+            controller = FirefightersAlertsController()
+            try:
+                if len(alert_id) > 0:
+                    self.write(controller.get_alert_info(int(firefighter_id), int(alert_id)))
+                else:
+                    self.write(controller.get_firefighter_alerts_info(int(firefighter_id)))
+            except ValueError:
+                raise HTTPError(405)
+            except ObjectNotFoundInDBException:
+                raise HTTPError(404)
         else:
             raise HTTPError(405)
 
-    def post(self, alert_id=""):
-        firefighter_id = self.get_argument("firefighter_id", "")
+    def post(self,firefighter_id="", alert_id=""):
         if len(firefighter_id) == 0 or len(alert_id) > 0:
             raise HTTPError(405)
         else:
             controller = FirefightersAlertsController()
             try:
+                firefighter_id = self.get_argument("firefighter_id", "")
                 controller.assign_firefighter_to_alert(int(firefighter_id), int(alert_id))
                 self.set_status(201)
                 self.finish()

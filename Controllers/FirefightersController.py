@@ -50,7 +50,7 @@ class FirefightersController:
 
         birth_date = None
         if birth_date_str is not None and len(birth_date_str) > 0:
-            birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d')
+            birth_date = self.get_time_from_string_timestamp(birth_date_str)
 
         firefighter = Firefighter(name=name, last_name=last_name, birth_date=birth_date, is_active=True)
         self.dao.add(firefighter)
@@ -67,7 +67,7 @@ class FirefightersController:
             firefighter.last_name = last_name
 
         if birth_date_str is not None and len(birth_date_str) > 0:
-            firefighter.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d')
+            firefighter.birth_date = self.get_time_from_string_timestamp(birth_date_str)
 
         self.dao.add(firefighter)
 
@@ -80,7 +80,7 @@ class FirefightersController:
             raise ValueError
 
         if birth_date_str is not None and len(birth_date_str) > 0:
-            firefighter.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d')
+            firefighter.birth_date = self.get_time_from_string_timestamp(birth_date_str)
         else:
             firefighter.birth_date = None
 
@@ -89,3 +89,6 @@ class FirefightersController:
 
         self.dao.add(firefighter)
 
+    @staticmethod
+    def get_time_from_string_timestamp(timestamp_string: str) -> datetime:
+        return datetime.strptime(timestamp_string, '%Y-%m-%d')

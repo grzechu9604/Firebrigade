@@ -66,5 +66,5 @@ class AlertsController:
         self.dao.delete_alert(alert)
 
     @staticmethod
-    def get_time_from_string_timestamp(timestamp_string: str):
+    def get_time_from_string_timestamp(timestamp_string: str) -> datetime:
         return datetime.strptime(timestamp_string, '%Y-%m-%dT%H:%M:%S')

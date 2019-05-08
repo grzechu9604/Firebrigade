@@ -34,6 +34,14 @@ class Person(Base):
         sh.id = self.id
         return sh.to_json()
 
+    def to_full_json(self):
+        sh = SerializationHelper()
+        sh.name = self.name
+        sh.last_name = self.last_name
+        sh.id = self.id
+        sh.birth_date = self.birth_date
+        return sh.to_json()
+
 
 class HonoraryMember(Person):
     __tablename__ = 'HonoraryMembers'

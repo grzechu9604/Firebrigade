@@ -1,68 +1,82 @@
 from tornado.web import HTTPError
 from Application.MyBaseHandler import MyBaseHandler
-from DAOs import VehiclesDAO
+from Controllers.VehiclesController import VehiclesController
+from Exceptions.Exceptions import ObjectNotFoundInDBException
 
 
 class VehiclesHandler(MyBaseHandler):
     def get(self, vehicle_id=""):
-        dao = VehiclesDAO.VehiclesDAO()
-        response = dao.get_full_in_json(vehicle_id) if len(vehicle_id) > 0 else dao.query_all_in_list_json()
-        if response is None:
-            raise HTTPError(404)
+        controller = VehiclesController()
+        try:
+            response = controller.get_full_in_json(int(vehicle_id)) \
+                if len(vehicle_id) > 0 else controller.query_all_in_list_json()
 
-        self.set_header('Content-Type', 'application/json')
-        self.write(response)
+            self.set_header('Content-Type', 'application/json')
+            self.write(response)
+            self.set_status(200)
+            self.finish()
+        except ValueError:
+            raise HTTPError(405)
+        except ObjectNotFoundInDBException:
+            raise HTTPError(404)
 
     def post(self, vehicle_id=""):
         if len(vehicle_id) > 0:
             raise HTTPError(405)
         else:
-            dao = VehiclesDAO.VehiclesDAO()
-            success = dao.create_vehicle(self.get_argument("type"), self.get_argument("name"),
-                                         self.get_argument("description"), self.get_argument("seats_amount"))
-            if success:
+            controller = VehiclesController()
+            try:
+                controller.create_vehicle(self.get_argument("type"), self.get_argument("name"),
+                                          self.get_argument("description"), self.get_argument("seats_amount"))
+
                 self.set_status(201)
                 self.finish()
-            else:
-                raise HTTPError(403)
+            except ValueError:
+                raise HTTPError(405)
 
     def put(self, vehicle_id=""):
         if len(vehicle_id) == 0:
             raise HTTPError(405)
         else:
-            dao = VehiclesDAO.VehiclesDAO()
-            success = dao.update_vehicle_fully(vehicle_id, self.get_argument("type"), self.get_argument("name"),
-                                               self.get_argument("description"), self.get_argument("seats_amount"))
+            controller = VehiclesController()
+            try:
+                controller.update_vehicle_fully(int(vehicle_id), self.get_argument("type"), self.get_argument("name"),
+                                                self.get_argument("description"), self.get_argument("seats_amount"))
 
-            if success:
                 self.set_status(200)
                 self.finish()
-            else:
+            except ValueError:
+                raise HTTPError(405)
+            except ObjectNotFoundInDBException:
                 raise HTTPError(404)
 
     def patch(self, vehicle_id=""):
         if len(vehicle_id) == 0:
             raise HTTPError(405)
         else:
-            dao = VehiclesDAO.VehiclesDAO()
-            success = dao.update_vehicle_partially(vehicle_id, self.get_argument("type", None),
+            controller = VehiclesController()
+            try:
+                controller.update_vehicle_partially(int(vehicle_id), self.get_argument("type", None),
                                                    self.get_argument("name", None),
                                                    self.get_argument("description", None),
                                                    self.get_argument("seats_amount", None))
-            if success:
                 self.set_status(200)
                 self.finish()
-            else:
+            except ValueError:
+                raise HTTPError(405)
+            except ObjectNotFoundInDBException:
                 raise HTTPError(404)
 
     def delete(self, vehicle_id=""):
         if len(vehicle_id) == 0:
             raise HTTPError(405)
         else:
-            dao = VehiclesDAO.VehiclesDAO()
-            success = dao.delete_vehicle(vehicle_id)
-            if success:
+            controller = VehiclesController()
+            try:
+                controller.delete_vehicle(int(vehicle_id))
                 self.set_status(204)
                 self.finish()
-            else:
+            except ValueError:
+                raise HTTPError(405)
+            except ObjectNotFoundInDBException:
                 raise HTTPError(404)

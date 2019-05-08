@@ -16,10 +16,10 @@ class FirefightersDAO:
     def get(self, firefighter_id: int) -> Firefighter:
         return self.connector.get_by_id(Firefighter, firefighter_id)
 
-    def add(self, firefighter: Firefighter):
+    def add(self, firefighter: Firefighter) -> None:
         try:
             self.connector.add_to_db(firefighter)
             self.connector.session.commit()
-        except Exception as e:
+        except Exception:
             self.connector.session.rollback()
-            raise e
+            raise
