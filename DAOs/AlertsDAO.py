@@ -10,10 +10,10 @@ class AlertsDAO:
     def query_all(self):
         return self.connector.query_from_db(Alert).all()
 
-    def get(self, alert_id):
+    def get(self, alert_id: int) -> Alert:
         return self.connector.get_by_id(Alert, alert_id)
 
-    def add(self, alert):
+    def add(self, alert: Alert):
         self.connector.add_to_db(alert)
 
     def query_all_in_list_json(self):

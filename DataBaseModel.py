@@ -27,6 +27,13 @@ class Person(Base):
     birth_date = Column(Date(), nullable=True)
     alerts = relationship("Alert", secondary=alerts_people, back_populates="persons")
 
+    def to_list_json(self):
+        sh = SerializationHelper()
+        sh.name = self.name
+        sh.last_name = self.last_name
+        sh.id = self.id
+        return sh.to_json()
+
 
 class HonoraryMember(Person):
     __tablename__ = 'HonoraryMembers'

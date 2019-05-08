@@ -10,10 +10,10 @@ class FirefightersDAO:
     def query_all(self):
         return self.connector.query_from_db(Firefighter).all()
 
-    def get(self, firefighter_id):
+    def get(self, firefighter_id: int) -> Firefighter:
         return self.connector.get_by_id(Firefighter, firefighter_id)
 
-    def add(self, firefighter):
+    def add(self, firefighter: Firefighter):
         self.connector.add_to_db(firefighter)
 
     def query_all_in_list_json(self):
