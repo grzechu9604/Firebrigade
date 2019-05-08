@@ -83,4 +83,3 @@ class FirefightersHandler(MyBaseHandler):
                 raise HTTPError(405)
             except ObjectNotFoundInDBException:
                 raise HTTPError(404)
-
