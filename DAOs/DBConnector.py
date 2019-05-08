@@ -3,9 +3,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 
 from DataBaseModel import Base
+from Helpers.Singleton import Singleton
 
 
-class DBConnector:
+class DBConnector(metaclass=Singleton):
 
     engine = create_engine('sqlite:///../fire_brigade.db')
     Base.metadata.bind = engine
@@ -23,3 +24,10 @@ class DBConnector:
             return self.session.query(object_type).get(int(object_id))
         except NoResultFound:
             return None
+
+    def commit_session(self) -> None:
+        self.session.commit()
+
+    def rollback_session(self) -> None:
+        self.session.rollback()
+

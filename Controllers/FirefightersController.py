@@ -1,0 +1,91 @@
+from datetime import datetime
+
+from DAOs.FirefightersDAO import FirefightersDAO
+from DataBaseModel import Firefighter
+from Exceptions.Exceptions import ObjectNotFoundInDBException
+
+
+class FirefightersController:
+    dao = FirefightersDAO()
+
+    def get_firefighter(self, firefighter_id: int) -> Firefighter:
+        if isinstance(firefighter_id, int):
+            return self.dao.get(firefighter_id)
+        else:
+            raise ValueError
+
+    def get_active_firefighter(self, firefighter_id: int) -> Firefighter:
+        f = self.get_firefighter(firefighter_id)
+        if f is not None and f.is_active is True:
+            return f
+
+    def get_active_firefighter_info_in_json(self, firefighter_id: int) -> str:
+        firefighter = self.get_active_firefighter(firefighter_id)
+        if firefighter is None:
+            raise ObjectNotFoundInDBException
+        else:
+            return firefighter.to_full_json()
+
+    def get_firefighter_info_in_json(self, firefighter_id: int) -> str:
+        firefighter = self.get_firefighter(firefighter_id)
+        if firefighter is None:
+            raise ObjectNotFoundInDBException
+        else:
+            return firefighter.to_full_json()
+
+    def get_active_firefighters_info_in_json(self) -> str:
+        return str.format("[{0}]", str.join(",", [f.to_list_json() for f in self.dao.query_all_active()]))
+
+    def deactivate_firefighter(self, firefighter_id: int) -> None:
+        firefighter = self.get_firefighter(firefighter_id)
+        if firefighter is None or firefighter.is_active is False:
+            raise ObjectNotFoundInDBException
+        else:
+            firefighter.is_active = False
+            self.dao.add(firefighter)
+
+    def create_firefighter(self, name: str, last_name: str, birth_date_str: str) -> None:
+        if name is None or last_name is None or len(name) == 0 or len(last_name) == 0:
+            raise ValueError
+
+        birth_date = None
+        if birth_date_str is not None and len(birth_date_str) > 0:
+            birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d')
+
+        firefighter = Firefighter(name=name, last_name=last_name, birth_date=birth_date, is_active=True)
+        self.dao.add(firefighter)
+
+    def update_firefighter_partially(self, firefighter_id, name, last_name, birth_date_str) -> None:
+        firefighter = self.dao.get(firefighter_id)
+        if firefighter is None or firefighter.is_active is False:
+            raise ObjectNotFoundInDBException
+
+        if name is not None and len(name) > 0:
+            firefighter.name = name
+
+        if last_name is not None and len(last_name) > 0:
+            firefighter.last_name = last_name
+
+        if birth_date_str is not None and len(birth_date_str) > 0:
+            firefighter.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d')
+
+        self.dao.add(firefighter)
+
+    def update_firefighter_fully(self, firefighter_id, name, last_name, birth_date_str) -> None:
+        firefighter = self.dao.get(firefighter_id)
+        if firefighter is None or firefighter.is_active is False:
+            raise ObjectNotFoundInDBException
+
+        if name is None or len(name) == 0 or last_name is None or len(last_name) == 0:
+            raise ValueError
+
+        if birth_date_str is not None and len(birth_date_str) > 0:
+            firefighter.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d')
+        else:
+            firefighter.birth_date = None
+
+        firefighter.last_name = last_name
+        firefighter.name = name
+
+        self.dao.add(firefighter)
+
