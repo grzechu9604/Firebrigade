@@ -5,7 +5,10 @@ from DataBaseModel import Vehicle
 
 
 class VehiclesDAO:
-    connector = DBConnector()
+    connector: DBConnector = None
+
+    def __init__(self, connector: DBConnector):
+        self.connector = connector
 
     def query_all(self) -> List[Vehicle]:
         return self.connector.query_from_db(Vehicle).all()
@@ -14,17 +17,8 @@ class VehiclesDAO:
         return self.connector.get_by_id(Vehicle, vehicle_id)
 
     def add(self, vehicle: Vehicle) -> None:
-        try:
-            self.connector.add_to_db(vehicle)
-            self.connector.session.commit()
-        except Exception:
-            self.connector.session.rollback()
-            raise
+        self.connector.add_to_db(vehicle)
 
     def delete_vehicle(self, vehicle: Vehicle) -> None:
-        try:
-            self.connector.session.delete(vehicle)
-            self.connector.session.commit()
-        except Exception:
-            self.connector.session.rollback()
-            raise
+        self.connector.session.delete(vehicle)
+

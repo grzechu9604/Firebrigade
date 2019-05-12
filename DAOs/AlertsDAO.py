@@ -5,7 +5,10 @@ from DataBaseModel import Alert
 
 
 class AlertsDAO:
-    connector = DBConnector()
+    connector: DBConnector = None
+
+    def __init__(self, connector: DBConnector):
+        self.connector = connector
 
     def query_all(self) -> List[Alert]:
         return self.connector.query_from_db(Alert).all()
@@ -14,17 +17,8 @@ class AlertsDAO:
         return self.connector.get_by_id(Alert, alert_id)
 
     def add(self, alert: Alert) -> None:
-        try:
-            self.connector.add_to_db(alert)
-            self.connector.session.commit()
-        except Exception:
-            self.connector.session.rollback()
-            raise
+        self.connector.add_to_db(alert)
 
     def delete_alert(self, alert: Alert) -> None:
-        try:
-            self.connector.session.delete(alert)
-            self.connector.session.commit()
-        except Exception:
-            self.connector.session.rollback()
-            raise
+        self.connector.session.delete(alert)
+

@@ -5,7 +5,10 @@ from DataBaseModel import Firefighter
 
 
 class FirefightersDAO:
-    connector = DBConnector()
+    connector: DBConnector = None
+
+    def __init__(self, connector: DBConnector):
+        self.connector = connector
 
     def query_all_active(self) -> List[Firefighter]:
         return self.connector.query_from_db(Firefighter).filter(Firefighter.is_active == 1).all()
@@ -17,9 +20,5 @@ class FirefightersDAO:
         return self.connector.get_by_id(Firefighter, firefighter_id)
 
     def add(self, firefighter: Firefighter) -> None:
-        try:
-            self.connector.add_to_db(firefighter)
-            self.connector.session.commit()
-        except Exception:
-            self.connector.session.rollback()
-            raise
+        self.connector.add_to_db(firefighter)
+

@@ -6,7 +6,10 @@ from DataBaseModel import HonoraryMember
 
 
 class HonoraryMembersDAO:
-    connector = DBConnector()
+    connector: DBConnector = None
+
+    def __init__(self, connector: DBConnector):
+        self.connector = connector
 
     def query_all(self) -> List[HonoraryMember]:
         return self.connector.query_from_db(HonoraryMember).all()
@@ -18,10 +21,4 @@ class HonoraryMembersDAO:
         return self.connector.get_by_id(HonoraryMember, honorary_member_id)
 
     def add(self, honorary_member: HonoraryMember) -> None:
-        try:
-            self.connector.add_to_db(honorary_member)
-            self.connector.session.commit()
-        except Exception:
-            self.connector.session.rollback()
-            raise
-
+        self.connector.add_to_db(honorary_member)

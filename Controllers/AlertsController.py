@@ -1,12 +1,23 @@
 from datetime import datetime
 
+from sqlalchemy.orm import Session
+
 from DAOs.AlertsDAO import AlertsDAO
+from DAOs.DBConnector import DBConnector
+from DAOs.SessionProvider import SessionProvider
 from DataBaseModel import Alert
 from Exceptions.Exceptions import ObjectNotFoundInDBException
 
 
 class AlertsController:
-    dao = AlertsDAO()
+    dao: AlertsDAO = None
+    session: Session = None
+
+    def __init__(self):
+        sp = SessionProvider()
+        self.session = sp.get_session()
+        connector = DBConnector(self.session)
+        self.dao = AlertsDAO(connector)
 
     def get_alert(self, alert_id: int) -> Alert:
         if isinstance(alert_id, int):
@@ -30,7 +41,14 @@ class AlertsController:
             raise ValueError
 
         alert = Alert(reason=reason, timestamp=self.get_time_from_string_timestamp(timestamp))
-        self.dao.add(alert)
+        try:
+            self.dao.add(alert)
+            self.session.commit()
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
 
     def update_alert_partially(self, alert_id: int, reason: str, timestamp: str) -> None:
         alert: Alert = self.dao.get(alert_id)
@@ -43,7 +61,14 @@ class AlertsController:
         if timestamp is not None:
             alert.timestamp = self.get_time_from_string_timestamp(timestamp)
 
-        self.dao.add(alert)
+        try:
+            self.dao.add(alert)
+            self.session.commit()
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
 
     def update_alert_fully(self, alert_id: int, reason: str, timestamp:str):
         alert: Alert = self.dao.get(alert_id)
@@ -56,14 +81,28 @@ class AlertsController:
         alert.reason = reason
         alert.timestamp = self.get_time_from_string_timestamp(timestamp)
 
-        self.dao.add(alert)
+        try:
+            self.dao.add(alert)
+            self.session.commit()
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
 
     def delete_alert(self, alert_id: int) -> None:
         alert: Alert = self.dao.get(alert_id)
         if alert is None:
             raise ObjectNotFoundInDBException
 
-        self.dao.delete_alert(alert)
+        try:
+            self.dao.delete_alert(alert)
+            self.session.commit()
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
 
     @staticmethod
     def get_time_from_string_timestamp(timestamp_string: str) -> datetime:
