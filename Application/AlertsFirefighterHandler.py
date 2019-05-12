@@ -1,7 +1,8 @@
 from tornado.web import HTTPError
 from Application.MyBaseHandler import MyBaseHandler
 from Controllers.FirefightersAlertsController import FirefightersAlertsController
-from Exceptions.Exceptions import ObjectAlreadyExistsInCollectionException
+from Exceptions.Exceptions import ObjectAlreadyExistsInCollectionException, ObjectNotFoundInDBException, \
+    ObjectNotFoundInCollectionException
 
 
 class AlertsFirefightersHandler(MyBaseHandler):
