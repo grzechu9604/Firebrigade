@@ -19,32 +19,62 @@ class FirefightersController:
         self.dao = FirefightersDAO(connector)
 
     def get_firefighter(self, firefighter_id: int) -> Firefighter:
-        if isinstance(firefighter_id, int):
-            return self.dao.get(firefighter_id)
-        else:
-            raise ValueError
+        try:
+            if isinstance(firefighter_id, int):
+                return self.dao.get(firefighter_id)
+            else:
+                raise ValueError
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
 
     def get_active_firefighter(self, firefighter_id: int) -> Firefighter:
-        f = self.get_firefighter(firefighter_id)
-        if f is not None and f.is_active is True:
-            return f
+        try:
+            f = self.get_firefighter(firefighter_id)
+            if f is not None and f.is_active is True:
+                return f
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
 
     def get_active_firefighter_info_in_json(self, firefighter_id: int) -> str:
-        firefighter = self.get_active_firefighter(firefighter_id)
-        if firefighter is None:
-            raise ObjectNotFoundInDBException
-        else:
-            return firefighter.to_full_json()
+        try:
+            firefighter = self.get_active_firefighter(firefighter_id)
+            if firefighter is None:
+                raise ObjectNotFoundInDBException
+            else:
+                return firefighter.to_full_json()
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
 
     def get_firefighter_info_in_json(self, firefighter_id: int) -> str:
-        firefighter = self.get_firefighter(firefighter_id)
-        if firefighter is None:
-            raise ObjectNotFoundInDBException
-        else:
-            return firefighter.to_full_json()
+        try:
+            firefighter = self.get_firefighter(firefighter_id)
+            if firefighter is None:
+                raise ObjectNotFoundInDBException
+            else:
+                return firefighter.to_full_json()
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
 
     def get_active_firefighters_info_in_json(self) -> str:
-        return str.format("[{0}]", str.join(",", [f.to_list_json() for f in self.dao.query_all_active()]))
+        try:
+            return str.format("[{0}]", str.join(",", [f.to_list_json() for f in self.dao.query_all_active()]))
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
 
     def deactivate_firefighter(self, firefighter_id: int) -> None:
         try:
@@ -62,15 +92,15 @@ class FirefightersController:
             self.session.close()
 
     def create_firefighter(self, name: str, last_name: str, birth_date_str: str) -> None:
-        if name is None or last_name is None or len(name) == 0 or len(last_name) == 0:
-            raise ValueError
-
-        birth_date = None
-        if birth_date_str is not None and len(birth_date_str) > 0:
-            birth_date = self.get_time_from_string_timestamp(birth_date_str)
-
-        firefighter = Firefighter(name=name, last_name=last_name, birth_date=birth_date, is_active=True)
         try:
+            if name is None or last_name is None or len(name) == 0 or len(last_name) == 0:
+                raise ValueError
+
+            birth_date = None
+            if birth_date_str is not None and len(birth_date_str) > 0:
+                birth_date = self.get_time_from_string_timestamp(birth_date_str)
+
+            firefighter = Firefighter(name=name, last_name=last_name, birth_date=birth_date, is_active=True)
             self.dao.add(firefighter)
             self.session.commit()
         except Exception:
