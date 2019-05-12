@@ -1,5 +1,7 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
+
+from sqlalchemy.orm.exc import NoResultFound
 
 from DAOs.DBConnector import DBConnector
 from DataBaseModel import HonoraryMember
@@ -22,3 +24,12 @@ class HonoraryMembersDAO:
 
     def add(self, honorary_member: HonoraryMember) -> None:
         self.connector.add_to_db(honorary_member)
+
+    def get_same(self, honorary_member: HonoraryMember) -> Optional[HonoraryMember]:
+        try:
+            return self.connector.query_from_db(HonoraryMember)\
+                    .filter(HonoraryMember.name == honorary_member.name and
+                            HonoraryMember.birth_date == honorary_member.birth_date and
+                            HonoraryMember.last_name == honorary_member.last_name).one()
+        except NoResultFound:
+            return None

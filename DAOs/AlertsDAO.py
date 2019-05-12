@@ -1,4 +1,6 @@
-from typing import List
+from typing import List, Optional
+
+from sqlalchemy.orm.exc import NoResultFound
 
 from DAOs.DBConnector import DBConnector
 from DataBaseModel import Alert
@@ -22,3 +24,10 @@ class AlertsDAO:
     def delete_alert(self, alert: Alert) -> None:
         self.connector.session.delete(alert)
 
+    def get_same(self, alert: Alert) -> Optional[Alert]:
+        try:
+            return self.connector.query_from_db(Alert)\
+                    .filter(Alert.reason == alert.reason and
+                            Alert.timestamp == alert.timestamp).one()
+        except NoResultFound:
+            return None

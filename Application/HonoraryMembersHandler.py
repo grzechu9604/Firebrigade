@@ -2,7 +2,7 @@ from tornado.web import HTTPError
 
 from Controllers.HonoraryMembersController import HonoraryMembersController
 from Application.MyBaseHandler import MyBaseHandler
-from Exceptions.Exceptions import ObjectNotFoundInDBException
+from Exceptions.Exceptions import ObjectNotFoundInDBException, ObjectExistsInDBException
 
 
 class HonoraryMembersHandler(MyBaseHandler):
@@ -35,6 +35,8 @@ class HonoraryMembersHandler(MyBaseHandler):
                 self.finish()
             except ValueError:
                 raise HTTPError(405)
+            except ObjectExistsInDBException:
+                raise HTTPError(303)
 
     def put(self, honorary_member_id=""):
         if len(honorary_member_id) == 0:

@@ -6,7 +6,7 @@ from DAOs.AlertsDAO import AlertsDAO
 from DAOs.DBConnector import DBConnector
 from DAOs.SessionProvider import SessionProvider
 from DataBaseModel import Alert
-from Exceptions.Exceptions import ObjectNotFoundInDBException
+from Exceptions.Exceptions import ObjectNotFoundInDBException, ObjectExistsInDBException
 
 
 class AlertsController:
@@ -60,6 +60,9 @@ class AlertsController:
                 raise ValueError
 
             alert = Alert(reason=reason, timestamp=self.get_time_from_string_timestamp(timestamp))
+            existing_alert = self.dao.get_same(alert)
+            if existing_alert is not None:
+                raise ObjectExistsInDBException(existing_alert.id)
 
             self.dao.add(alert)
             self.session.commit()

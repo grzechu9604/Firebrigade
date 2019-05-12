@@ -1,4 +1,6 @@
-from typing import List
+from typing import List, Optional
+
+from sqlalchemy.orm.exc import NoResultFound
 
 from DAOs.DBConnector import DBConnector
 from DataBaseModel import Firefighter
@@ -22,3 +24,11 @@ class FirefightersDAO:
     def add(self, firefighter: Firefighter) -> None:
         self.connector.add_to_db(firefighter)
 
+    def get_same(self, firefighter: Firefighter) -> Optional[Firefighter]:
+        try:
+            return self.connector.query_from_db(Firefighter)\
+                    .filter(Firefighter.name == firefighter.name and
+                            Firefighter.birth_date == firefighter.birth_date and
+                            Firefighter.last_name == firefighter.last_name).one()
+        except NoResultFound:
+            return None

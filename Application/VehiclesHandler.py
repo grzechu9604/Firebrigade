@@ -1,7 +1,7 @@
 from tornado.web import HTTPError
 from Application.MyBaseHandler import MyBaseHandler
 from Controllers.VehiclesController import VehiclesController
-from Exceptions.Exceptions import ObjectNotFoundInDBException
+from Exceptions.Exceptions import ObjectNotFoundInDBException, ObjectExistsInDBException
 
 
 class VehiclesHandler(MyBaseHandler):
@@ -33,6 +33,8 @@ class VehiclesHandler(MyBaseHandler):
                 self.finish()
             except ValueError:
                 raise HTTPError(405)
+            except ObjectExistsInDBException:
+                raise HTTPError(303)
 
     def put(self, vehicle_id=""):
         if len(vehicle_id) == 0:

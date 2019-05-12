@@ -2,7 +2,7 @@ from tornado.web import HTTPError
 
 from Controllers.FirefightersController import FirefightersController
 from Application.MyBaseHandler import MyBaseHandler
-from Exceptions.Exceptions import ObjectNotFoundInDBException
+from Exceptions.Exceptions import ObjectNotFoundInDBException, ObjectExistsInDBException
 
 
 class FirefightersHandler(MyBaseHandler):
@@ -35,6 +35,8 @@ class FirefightersHandler(MyBaseHandler):
                 self.finish()
             except ValueError:
                 raise HTTPError(405)
+            except ObjectExistsInDBException:
+                raise HTTPError(303)
 
     def put(self, firefighter_id=""):
         if len(firefighter_id) == 0:

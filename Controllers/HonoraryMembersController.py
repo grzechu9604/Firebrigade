@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from DAOs.HonoraryMembersDAO import HonoraryMembersDAO
 from DataBaseModel import HonoraryMember
-from Exceptions.Exceptions import ObjectNotFoundInDBException
+from Exceptions.Exceptions import ObjectNotFoundInDBException, ObjectExistsInDBException
 from DAOs.SessionProvider import SessionProvider
 from DAOs.DBConnector import DBConnector
 
@@ -101,6 +101,10 @@ class HonoraryMembersController:
                 birth_date = self.get_time_from_string_timestamp(birth_date_str)
 
             honorary_member = HonoraryMember(name=name, last_name=last_name, birth_date=birth_date, is_active=True)
+            existing_honorary_member = self.dao.get_same(honorary_member)
+            if existing_honorary_member is not None:
+                raise ObjectExistsInDBException(existing_honorary_member.id)
+
             self.dao.add(honorary_member)
             self.session.commit()
         except Exception:

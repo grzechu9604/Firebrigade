@@ -1,7 +1,7 @@
 from tornado.web import HTTPError
 from Application.MyBaseHandler import MyBaseHandler
 from Controllers.AlertsController import AlertsController
-from Exceptions.Exceptions import ObjectNotFoundInDBException
+from Exceptions.Exceptions import ObjectNotFoundInDBException, ObjectExistsInDBException
 
 
 class AlertsHandler(MyBaseHandler):
@@ -32,6 +32,8 @@ class AlertsHandler(MyBaseHandler):
                 self.finish()
             except ValueError:
                 raise HTTPError(405)
+            except ObjectExistsInDBException:
+                raise HTTPError(303)
 
     def put(self, alert_id=""):
         if len(alert_id) == 0:
@@ -47,6 +49,7 @@ class AlertsHandler(MyBaseHandler):
                 raise HTTPError(405)
             except ObjectNotFoundInDBException:
                 raise HTTPError(404)
+
 
     def patch(self, alert_id=""):
         if len(alert_id) == 0:

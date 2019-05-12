@@ -5,7 +5,7 @@ from DAOs.DBConnector import DBConnector
 from DAOs.FirefightersDAO import FirefightersDAO
 from DAOs.SessionProvider import SessionProvider
 from DataBaseModel import Firefighter
-from Exceptions.Exceptions import ObjectNotFoundInDBException
+from Exceptions.Exceptions import ObjectNotFoundInDBException, ObjectExistsInDBException
 
 
 class FirefightersController:
@@ -101,6 +101,10 @@ class FirefightersController:
                 birth_date = self.get_time_from_string_timestamp(birth_date_str)
 
             firefighter = Firefighter(name=name, last_name=last_name, birth_date=birth_date, is_active=True)
+            existing_firefighter = self.dao.get_same(firefighter)
+            if existing_firefighter is not None:
+                raise ObjectExistsInDBException(existing_firefighter.id)
+
             self.dao.add(firefighter)
             self.session.commit()
         except Exception:

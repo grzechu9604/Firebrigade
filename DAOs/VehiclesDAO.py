@@ -1,4 +1,6 @@
-from typing import List
+from typing import List, Optional
+
+from sqlalchemy.orm.exc import NoResultFound
 
 from DAOs.DBConnector import DBConnector
 from DataBaseModel import Vehicle
@@ -22,3 +24,12 @@ class VehiclesDAO:
     def delete_vehicle(self, vehicle: Vehicle) -> None:
         self.connector.session.delete(vehicle)
 
+    def get_same(self, vehicle: Vehicle) -> Optional[Vehicle]:
+        try:
+            return self.connector.query_from_db(Vehicle)\
+                    .filter(Vehicle.seats_amount == vehicle.seats_amount and
+                            Vehicle.name == vehicle.name and
+                            Vehicle.description == vehicle.description and
+                            Vehicle.type == vehicle.type).one()
+        except NoResultFound:
+            return None

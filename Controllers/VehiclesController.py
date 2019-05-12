@@ -1,6 +1,6 @@
 from DAOs.VehiclesDAO import VehiclesDAO
 from DataBaseModel import Vehicle
-from Exceptions.Exceptions import ObjectNotFoundInDBException
+from Exceptions.Exceptions import ObjectNotFoundInDBException, ObjectExistsInDBException
 from sqlalchemy.orm import Session
 from DAOs.DBConnector import DBConnector
 from DAOs.SessionProvider import SessionProvider
@@ -74,6 +74,10 @@ class VehiclesController:
                 raise ValueError
 
             vehicle = Vehicle(type=vehicle_type, name=name, description=description, seats_amount=int(seats_amount))
+            existing_vehicle = self.dao.get_same(vehicle)
+            if existing_vehicle is not None:
+                raise ObjectExistsInDBException(existing_vehicle.id)
+
             self.dao.add(vehicle)
             self.session.commit()
         except Exception:
