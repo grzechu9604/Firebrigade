@@ -33,3 +33,7 @@ class HonoraryMembersDAO:
                             HonoraryMember.last_name == honorary_member.last_name).one()
         except NoResultFound:
             return None
+
+    def query_page_active(self, page_no:int = 1, records_per_page:int = 10) -> List[HonoraryMember]:
+        return self.connector.query_from_db(HonoraryMember).filter(HonoraryMember.is_active == 1).\
+                limit(records_per_page).offset((page_no - 1) * records_per_page).all()

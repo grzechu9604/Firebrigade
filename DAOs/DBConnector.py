@@ -1,3 +1,4 @@
+from sqlalchemy.orm import query
 from sqlalchemy.orm.exc import NoResultFound
 
 
@@ -7,7 +8,7 @@ class DBConnector:
     def __init__(self, session):
         self.session = session
 
-    def query_from_db(self, object_type):
+    def query_from_db(self, object_type) -> query:
         return self.session.query(object_type)
 
     def add_to_db(self, new_object):

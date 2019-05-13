@@ -9,7 +9,10 @@ class VehiclesHandler(MyBaseHandler):
         controller = VehiclesController()
         try:
             response = controller.get_full_in_json(int(vehicle_id)) \
-                if len(vehicle_id) > 0 else controller.query_all_in_list_json()
+                if len(vehicle_id)  > 0 else \
+                controller.query_page_in_list_json(
+                    int(self.get_argument("page_no", 1)),
+                    int(self.get_argument("records_per_page", 10)))
 
             self.set_header('Content-Type', 'application/json')
             self.write(response)

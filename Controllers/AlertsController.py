@@ -41,6 +41,17 @@ class AlertsController:
         finally:
             self.session.close()
 
+    def query_page_in_list_json(self, page_no: int = 1, records_per_page: int = 10) -> str:
+        try:
+            alerts_page = self.dao.query_page(page_no, records_per_page) \
+                if page_no > 0 else self.dao.query_all()
+            return "[" + str.join(",", [a.to_list_json() for a in alerts_page]) + "]"
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
+
     def get_full_in_json(self, alert_id: int) -> str:
         try:
             alert = self.dao.get(alert_id)

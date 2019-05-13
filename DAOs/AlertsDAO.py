@@ -31,3 +31,7 @@ class AlertsDAO:
                             Alert.timestamp == alert.timestamp).one()
         except NoResultFound:
             return None
+
+    def query_page(self, page_no: int = 1, records_per_page: int = 10) -> List[Alert]:
+        return self.connector.query_from_db(Alert).limit(records_per_page)\
+            .offset((page_no - 1) * records_per_page).all()

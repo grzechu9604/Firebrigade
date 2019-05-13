@@ -76,6 +76,17 @@ class FirefightersController:
         finally:
             self.session.close()
 
+    def query_page_active_firefighters_in_list_json(self, page_no: int, records_per_page: int) -> str:
+        try:
+            firefighters_page = self.dao.query_page_active(page_no, records_per_page) \
+                if page_no > 0 else self.dao.query_all_active()
+            return "[" + str.join(",", [f.to_list_json() for f in firefighters_page]) + "]"
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
+
     def deactivate_firefighter(self, firefighter_id: int) -> None:
         try:
             firefighter = self.get_firefighter(firefighter_id)

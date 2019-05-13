@@ -38,6 +38,17 @@ class VehiclesController:
         finally:
             self.session.close()
 
+    def query_page_in_list_json(self, page_no: int = 1, records_per_page: int = 10) -> str:
+        try:
+            vehicles_page = self.dao.query_page(page_no, records_per_page) \
+                if page_no > 0 else self.dao.query_all()
+            return "[" + str.join(",", [v.to_list_json() for v in vehicles_page]) + "]"
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
+
     def get_full_in_json(self, vehicle_id: int) -> str:
         try:
             vehicle: Vehicle = self.get_vehicle(vehicle_id)

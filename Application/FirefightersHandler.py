@@ -10,7 +10,10 @@ class FirefightersHandler(MyBaseHandler):
         controller = FirefightersController()
         try:
             response = controller.get_active_firefighter_info_in_json(int(firefighter_id)) \
-                if len(firefighter_id) > 0 else controller.get_active_firefighters_info_in_json()
+                if len(firefighter_id) > 0 else \
+                controller.query_page_active_firefighters_in_list_json(
+                    int(self.get_argument("page_no", 1)),
+                    int(self.get_argument("records_per_page", 10)))
 
             self.set_header('Content-Type', 'application/json')
             self.write(response)

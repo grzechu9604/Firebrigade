@@ -32,3 +32,7 @@ class FirefightersDAO:
                             Firefighter.last_name == firefighter.last_name).one()
         except NoResultFound:
             return None
+
+    def query_page_active(self, page_no: int = 1, records_per_page: int = 10) -> List[Firefighter]:
+        return self.connector.query_from_db(Firefighter).filter(Firefighter.is_active == 1).\
+                limit(records_per_page).offset((page_no - 1) * records_per_page).all()

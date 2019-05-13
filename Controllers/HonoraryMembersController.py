@@ -76,6 +76,17 @@ class HonoraryMembersController:
         finally:
             self.session.close()
 
+    def query_page_active_honorary_members_in_list_json(self, page_no: int = 1, records_per_page: int = 10) -> str:
+        try:
+            members_page = self.dao.query_page_active(page_no, records_per_page) \
+                if page_no > 0 else self.dao.query_all_active()
+            return "[" + str.join(",", [a.to_list_json() for a in members_page]) + "]"
+        except Exception:
+            self.session.rollback()
+            raise
+        finally:
+            self.session.close()
+
     def deactivate_honorary_member(self, honorary_member_id: int) -> None:
         try:
             honorary_member = self.get_honorary_member(honorary_member_id)
