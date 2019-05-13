@@ -4,6 +4,9 @@ from tornado import web
 
 class MyBaseHandler(web.RequestHandler):
 
+    def data_received(self, chunk):
+        pass
+
     def write_error(self, status_code, **kwargs):
         self.set_header('Content-Type', 'application/json')
         self.finish(json.dumps({

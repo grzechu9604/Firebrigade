@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -34,6 +33,6 @@ class HonoraryMembersDAO:
         except NoResultFound:
             return None
 
-    def query_page_active(self, page_no:int = 1, records_per_page:int = 10) -> List[HonoraryMember]:
+    def query_page_active(self, page_no: int = 1, records_per_page: int = 10) -> List[HonoraryMember]:
         return self.connector.query_from_db(HonoraryMember).filter(HonoraryMember.is_active == 1).\
                 limit(records_per_page).offset((page_no - 1) * records_per_page).all()

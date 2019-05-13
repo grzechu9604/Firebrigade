@@ -8,9 +8,10 @@ class AlertsHandler(MyBaseHandler):
     def get(self, alert_id=""):
         controller = AlertsController()
         try:
-            response = controller.get_full_in_json(int(alert_id)) \
-                if len(alert_id) > 0 else \
-                controller.query_page_in_list_json(
+            if len(alert_id) > 0:
+                response = controller.get_full_in_json(int(alert_id))
+            else:
+                response = controller.query_page_in_list_json(
                     int(self.get_argument("page_no", 1)),
                     int(self.get_argument("records_per_page", 10)))
 
@@ -52,7 +53,6 @@ class AlertsHandler(MyBaseHandler):
                 raise HTTPError(405)
             except ObjectNotFoundInDBException:
                 raise HTTPError(404)
-
 
     def patch(self, alert_id=""):
         if len(alert_id) == 0:

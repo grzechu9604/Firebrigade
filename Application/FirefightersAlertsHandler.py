@@ -22,7 +22,7 @@ class FirefightersAlertsHandler(MyBaseHandler):
         else:
             raise HTTPError(405)
 
-    def post(self,firefighter_id="", alert_id=""):
+    def post(self, firefighter_id="", alert_id=""):
         if len(firefighter_id) == 0 or len(alert_id) > 0:
             raise HTTPError(405)
         else:

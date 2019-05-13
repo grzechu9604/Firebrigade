@@ -9,7 +9,7 @@ class VehiclesHandler(MyBaseHandler):
         controller = VehiclesController()
         try:
             response = controller.get_full_in_json(int(vehicle_id)) \
-                if len(vehicle_id)  > 0 else \
+                if len(vehicle_id) > 0 else \
                 controller.query_page_in_list_json(
                     int(self.get_argument("page_no", 1)),
                     int(self.get_argument("records_per_page", 10)))
@@ -62,9 +62,9 @@ class VehiclesHandler(MyBaseHandler):
             controller = VehiclesController()
             try:
                 controller.update_vehicle_partially(int(vehicle_id), self.get_argument("type", None),
-                                                   self.get_argument("name", None),
-                                                   self.get_argument("description", None),
-                                                   self.get_argument("seats_amount", None))
+                                                    self.get_argument("name", None),
+                                                    self.get_argument("description", None),
+                                                    self.get_argument("seats_amount", None))
                 self.set_status(200)
                 self.finish()
             except ValueError:
