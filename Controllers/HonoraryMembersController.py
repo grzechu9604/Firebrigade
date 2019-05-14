@@ -1,8 +1,11 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from sqlalchemy.orm import Session
+
+from DAOs.FirefightersDAO import FirefightersDAO
 from DAOs.HonoraryMembersDAO import HonoraryMembersDAO
-from DataBaseModel import HonoraryMember
+from DAOs.PersonsDAO import PersonsDAO
+from DataBaseModel import HonoraryMember, Person
 from Exceptions.Exceptions import ObjectNotFoundInDBException, ObjectExistsInDBException
 from DAOs.SessionProvider import SessionProvider
 from DAOs.DBConnector import DBConnector
@@ -11,12 +14,14 @@ from DAOs.DBConnector import DBConnector
 class HonoraryMembersController:
     dao: HonoraryMembersDAO = None
     session: Session = None
+    persons_dao: PersonsDAO = None
 
     def __init__(self):
         sp = SessionProvider()
         self.session = sp.get_session()
         connector = DBConnector(self.session)
         self.dao = HonoraryMembersDAO(connector)
+        self.firefighters_dao = FirefightersDAO(connector)
 
     def get_honorary_member(self, honorary_member_id: int) -> HonoraryMember:
         try:
@@ -90,7 +95,7 @@ class HonoraryMembersController:
     def deactivate_honorary_member(self, honorary_member_id: int) -> None:
         try:
             honorary_member = self.get_honorary_member(honorary_member_id)
-            if honorary_member is None:
+            if honorary_member is None or honorary_member.is_active is False:
                 raise ObjectNotFoundInDBException
             else:
                 honorary_member.is_active = False
@@ -102,19 +107,31 @@ class HonoraryMembersController:
         finally:
             self.session.close()
 
-    def create_honorary_member(self, name: str, last_name: str, birth_date_str: str) -> None:
+    def create_honorary_member(self, name: str, last_name: str, birth_date_str: str,
+                               inactive_firefighter_id: int) -> None:
         try:
-            if name is None or last_name is None or len(name) == 0 or len(last_name) == 0:
-                raise ValueError
+            if inactive_firefighter_id is not None:
+                firefighter = self.firefighters_dao.get(int(inactive_firefighter_id))
 
-            birth_date = None
-            if birth_date_str is not None and len(birth_date_str) > 0:
-                birth_date = self.get_time_from_string_timestamp(birth_date_str)
+                if firefighter is None or firefighter.is_active:
+                    raise ObjectNotFoundInDBException
 
-            honorary_member = HonoraryMember(name=name, last_name=last_name, birth_date=birth_date, is_active=True)
+                person = firefighter.person
+
+            else:
+                if name is None or last_name is None or len(name) == 0 or len(last_name) == 0:
+                    raise ValueError
+
+                birth_date = None
+                if birth_date_str is not None and len(birth_date_str) > 0:
+                    birth_date = self.get_time_from_string_timestamp(birth_date_str)
+
+                person = Person(name=name, last_name=last_name, birth_date=birth_date)
+
+            honorary_member = HonoraryMember(person=person, is_active=True)
             existing_honorary_member = self.dao.get_same(honorary_member)
             if existing_honorary_member is not None:
-                raise ObjectExistsInDBException(existing_honorary_member.id)
+                raise ObjectExistsInDBException(existing_honorary_member.person_id)
 
             self.dao.add(honorary_member)
             self.session.commit()
@@ -131,13 +148,13 @@ class HonoraryMembersController:
                 raise ObjectNotFoundInDBException
 
             if name is not None and len(name) > 0:
-                honorary_member.name = name
+                honorary_member.person.name = name
 
             if last_name is not None and len(last_name) > 0:
-                honorary_member.last_name = last_name
+                honorary_member.person.last_name = last_name
 
             if birth_date_str is not None and len(birth_date_str) > 0:
-                honorary_member.birth_date = self.get_time_from_string_timestamp(birth_date_str)
+                honorary_member.person.birth_date = self.get_time_from_string_timestamp(birth_date_str)
 
             self.dao.add(honorary_member)
             self.session.commit()
@@ -158,12 +175,12 @@ class HonoraryMembersController:
                 raise ValueError
 
             if birth_date_str is not None and len(birth_date_str) > 0:
-                honorary_member.birth_date = self.get_time_from_string_timestamp(birth_date_str)
+                honorary_member.person.birth_date = self.get_time_from_string_timestamp(birth_date_str)
             else:
-                honorary_member.birth_date = None
+                honorary_member.person.birth_date = None
 
-            honorary_member.last_name = last_name
-            honorary_member.name = name
+            honorary_member.person.last_name = last_name
+            honorary_member.person.name = name
 
             self.dao.add(honorary_member)
             self.session.commit()
@@ -175,5 +192,5 @@ class HonoraryMembersController:
             self.session.close()
 
     @staticmethod
-    def get_time_from_string_timestamp(timestamp_string: str) -> datetime:
-        return datetime.strptime(timestamp_string, '%Y-%m-%d')
+    def get_time_from_string_timestamp(timestamp_string: str) -> date:
+        return datetime.strptime(timestamp_string, '%Y-%m-%d').date()

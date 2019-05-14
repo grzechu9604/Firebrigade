@@ -42,51 +42,51 @@ class Person(Base):
         return sh.to_json()
 
 
-class HonoraryMember(Person):
+class HonoraryMember(Base):
     __tablename__ = 'HonoraryMembers'
 
     is_active = Column(Boolean, nullable=False)
     person_id = Column(Integer, ForeignKey('People.id'), primary_key=True)
-    person = relationship(Person)
+    person = relationship(Person, lazy="joined")
 
     def to_list_json(self):
         sh = SerializationHelper()
-        sh.name = self.name
-        sh.last_name = self.last_name
-        sh.id = self.id
-        sh.link = "~/honoraryMembers/" + str(self.id)
+        sh.name = self.person.name
+        sh.last_name = self.person.last_name
+        sh.id = self.person.id
+        sh.link = "~/honoraryMembers/" + str(self.person.id)
         return sh.to_json()
 
     def to_full_json(self):
         sh = SerializationHelper()
-        sh.name = self.name
-        sh.last_name = self.last_name
-        sh.id = self.id
-        sh.birth_date = self.birth_date
+        sh.name = self.person.name
+        sh.last_name = self.person.last_name
+        sh.id = self.person.id
+        sh.birth_date = self.person.birth_date
         return sh.to_json()
 
 
-class Firefighter(Person):
+class Firefighter(Base):
     __tablename__ = 'Firefighters'
 
     is_active = Column(Boolean, nullable=False)
     person_id = Column(Integer, ForeignKey('People.id'), primary_key=True)
-    person = relationship(Person)
+    person = relationship(Person, lazy="joined")
 
     def to_list_json(self):
         sh = SerializationHelper()
-        sh.name = self.name
-        sh.last_name = self.last_name
-        sh.id = self.id
-        sh.link = "~/firefighters/" + str(self.id)
+        sh.name = self.person.name
+        sh.last_name = self.person.last_name
+        sh.id = self.person.id
+        sh.link = "~/firefighters/" + str(self.person.id)
         return sh.to_json()
 
     def to_full_json(self):
         sh = SerializationHelper()
-        sh.name = self.name
-        sh.last_name = self.last_name
-        sh.id = self.id
-        sh.birth_date = self.birth_date
+        sh.name = self.person.name
+        sh.last_name = self.person.last_name
+        sh.id = self.person.id
+        sh.birth_date = self.person.birth_date
         return sh.to_json()
 
 

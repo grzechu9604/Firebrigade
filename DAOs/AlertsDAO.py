@@ -27,7 +27,7 @@ class AlertsDAO:
     def get_same(self, alert: Alert) -> Optional[Alert]:
         try:
             return self.connector.query_from_db(Alert)\
-                    .filter(Alert.reason == alert.reason and
+                    .filter(Alert.reason == alert.reason,
                             Alert.timestamp == alert.timestamp).one()
         except NoResultFound:
             return None

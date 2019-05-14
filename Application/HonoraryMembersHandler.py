@@ -30,9 +30,10 @@ class HonoraryMembersHandler(MyBaseHandler):
         else:
             controller = HonoraryMembersController()
             try:
-                controller.create_honorary_member(self.get_argument("name"),
-                                                  self.get_argument("last_name"),
-                                                  self.get_argument("birth_date", None))
+                controller.create_honorary_member(self.get_argument("name", None),
+                                                  self.get_argument("last_name", None),
+                                                  self.get_argument("birth_date", None),
+                                                  self.get_argument("inactive_firefighter_id", None))
 
                 self.set_status(201)
                 self.finish()
@@ -40,6 +41,8 @@ class HonoraryMembersHandler(MyBaseHandler):
                 raise HTTPError(405)
             except ObjectExistsInDBException:
                 raise HTTPError(303)
+            except ObjectNotFoundInDBException:
+                raise HTTPError(404)
 
     def put(self, honorary_member_id=""):
         if len(honorary_member_id) == 0:

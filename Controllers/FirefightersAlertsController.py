@@ -26,13 +26,16 @@ class FirefightersAlertsController:
             if isinstance(firefighter_id, int) and isinstance(alert_id, int):
                 firefighter = self.firefighters_dao.get(firefighter_id)
 
-                if firefighter.is_active is False:
+                if firefighter is None or firefighter.is_active is False:
                     raise ObjectNotFoundInDBException
 
                 alert = self.alerts_dao.get(alert_id)
 
-                if not any(alert.id == a.id for a in firefighter.alerts):
-                    firefighter.alerts.append(alert)
+                if alert is None:
+                    raise ObjectNotFoundInDBException
+
+                if not any(alert.id == a.id for a in firefighter.person.alerts):
+                    firefighter.person.alerts.append(alert)
                     self.session.commit()
                 else:
                     raise ObjectAlreadyExistsInCollectionException
@@ -50,8 +53,11 @@ class FirefightersAlertsController:
                 firefighter = self.firefighters_dao.get(firefighter_id)
                 alert = self.alerts_dao.get(alert_id)
 
-                if any(alert.id == a.id for a in firefighter.alerts):
-                    firefighter.alerts.remove(alert)
+                if firefighter is None or alert is None:
+                    raise ObjectNotFoundInDBException
+
+                if any(alert.id == a.id for a in firefighter.person.alerts):
+                    firefighter.person.alerts.remove(alert)
                     self.session.commit()
                 else:
                     raise ObjectNotFoundInCollectionException
@@ -67,6 +73,10 @@ class FirefightersAlertsController:
         try:
             if isinstance(alert_id, int):
                 alert = self.alerts_dao.get(alert_id)
+
+                if alert is None:
+                    raise ObjectNotFoundInDBException
+
                 return "[{0}]".format(str.join(",", [f.to_list_json() for f in alert.persons]))
             else:
                 raise ValueError
@@ -80,7 +90,11 @@ class FirefightersAlertsController:
         try:
             if isinstance(firefighter_id, int):
                 firefighter = self.firefighters_dao.get(firefighter_id)
-                return "[{0}]".format(str.join(",", [a.to_list_json() for a in firefighter.alerts]))
+
+                if firefighter is None:
+                    raise ObjectNotFoundInDBException
+
+                return "[{0}]".format(str.join(",", [a.to_list_json() for a in firefighter.person.alerts]))
             else:
                 raise ValueError
         except Exception:
@@ -102,7 +116,7 @@ class FirefightersAlertsController:
                 if firefighter is None:
                     raise ObjectNotFoundInDBException
 
-                alert = next((a for a in firefighter.alerts if a.id == alert_id), None)
+                alert = next((a for a in firefighter.person.alerts if a.id == alert_id), None)
                 if alert is None:
                     raise ObjectNotFoundInDBException
 

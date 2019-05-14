@@ -109,7 +109,7 @@ class AlertsController:
             if alert is None:
                 raise ObjectNotFoundInDBException
 
-            if reason is None or len(reason) > 0 or timestamp is None:
+            if reason is None or len(reason) == 0 or timestamp is None:
                 raise ValueError
 
             alert.reason = reason

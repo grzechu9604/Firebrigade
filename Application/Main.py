@@ -1,6 +1,7 @@
 import tornado.ioloop
 import tornado.web
 
+from Application.FirefightersPensionsHandler import FirefightersPensionsHandler
 from Application.MainHandler import MainHandler
 from Application.AlertsHandler import AlertsHandler
 from Application.VehiclesHandler import VehiclesHandler
@@ -24,7 +25,7 @@ if __name__ == "__main__":
         (r"/alerts/([0-9]+)/firefighters/([0-9]+)", AlertsFirefightersHandler),
         (r"/firefighters/([0-9]+)/alerts[\/]{0,1}", FirefightersAlertsHandler),
         (r"/firefighters/([0-9]+)/alerts/([0-9]+)", FirefightersAlertsHandler),
-
+        (r"/firefightersPensions/([0-9]+)", FirefightersPensionsHandler),
     ]
     application = tornado.web.Application(handlers)
     application.listen(8888)

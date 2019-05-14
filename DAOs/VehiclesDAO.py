@@ -27,9 +27,9 @@ class VehiclesDAO:
     def get_same(self, vehicle: Vehicle) -> Optional[Vehicle]:
         try:
             return self.connector.query_from_db(Vehicle)\
-                    .filter(Vehicle.seats_amount == vehicle.seats_amount and
-                            Vehicle.name == vehicle.name and
-                            Vehicle.description == vehicle.description and
+                    .filter(Vehicle.seats_amount == vehicle.seats_amount,
+                            Vehicle.name == vehicle.name,
+                            Vehicle.description == vehicle.description,
                             Vehicle.type == vehicle.type).one()
         except NoResultFound:
             return None

@@ -3,6 +3,7 @@ from typing import List, Optional
 from sqlalchemy.orm.exc import NoResultFound
 
 from DAOs.DBConnector import DBConnector
+from DAOs.PersonsDAO import PersonsDAO
 from DataBaseModel import Firefighter
 
 
@@ -26,10 +27,11 @@ class FirefightersDAO:
 
     def get_same(self, firefighter: Firefighter) -> Optional[Firefighter]:
         try:
-            return self.connector.query_from_db(Firefighter)\
-                    .filter(Firefighter.name == firefighter.name and
-                            Firefighter.birth_date == firefighter.birth_date and
-                            Firefighter.last_name == firefighter.last_name).one()
+            persons_dao = PersonsDAO(self.connector)
+            same_person = persons_dao.get_same(firefighter.person)
+
+            if same_person is not None:
+                return self.get(same_person.id)
         except NoResultFound:
             return None
 

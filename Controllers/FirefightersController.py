@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy.orm import Session
 
 from DAOs.DBConnector import DBConnector
 from DAOs.FirefightersDAO import FirefightersDAO
 from DAOs.SessionProvider import SessionProvider
-from DataBaseModel import Firefighter
+from DataBaseModel import Firefighter, Person
 from Exceptions.Exceptions import ObjectNotFoundInDBException, ObjectExistsInDBException
 
 
@@ -111,10 +111,11 @@ class FirefightersController:
             if birth_date_str is not None and len(birth_date_str) > 0:
                 birth_date = self.get_time_from_string_timestamp(birth_date_str)
 
-            firefighter = Firefighter(name=name, last_name=last_name, birth_date=birth_date, is_active=True)
+            person = Person(name=name, last_name=last_name, birth_date=birth_date)
+            firefighter = Firefighter(person=person, is_active=True)
             existing_firefighter = self.dao.get_same(firefighter)
             if existing_firefighter is not None:
-                raise ObjectExistsInDBException(existing_firefighter.id)
+                raise ObjectExistsInDBException(existing_firefighter.person_id)
 
             self.dao.add(firefighter)
             self.session.commit()
@@ -131,13 +132,13 @@ class FirefightersController:
                 raise ObjectNotFoundInDBException
 
             if name is not None and len(name) > 0:
-                firefighter.name = name
+                firefighter.person.name = name
 
             if last_name is not None and len(last_name) > 0:
-                firefighter.last_name = last_name
+                firefighter.person.last_name = last_name
 
             if birth_date_str is not None and len(birth_date_str) > 0:
-                firefighter.birth_date = self.get_time_from_string_timestamp(birth_date_str)
+                firefighter.person.birth_date = self.get_time_from_string_timestamp(birth_date_str)
 
             self.dao.add(firefighter)
             self.session.commit()
@@ -157,12 +158,12 @@ class FirefightersController:
                 raise ValueError
 
             if birth_date_str is not None and len(birth_date_str) > 0:
-                firefighter.birth_date = self.get_time_from_string_timestamp(birth_date_str)
+                firefighter.person.birth_date = self.get_time_from_string_timestamp(birth_date_str)
             else:
-                firefighter.birth_date = None
+                firefighter.person.birth_date = None
 
-            firefighter.last_name = last_name
-            firefighter.name = name
+            firefighter.person.last_name = last_name
+            firefighter.person.name = name
 
             self.dao.add(firefighter)
             self.session.commit()
@@ -173,5 +174,5 @@ class FirefightersController:
             self.session.close()
 
     @staticmethod
-    def get_time_from_string_timestamp(timestamp_string: str) -> datetime:
-        return datetime.strptime(timestamp_string, '%Y-%m-%d')
+    def get_time_from_string_timestamp(timestamp_string: str) -> date:
+        return datetime.strptime(timestamp_string, '%Y-%m-%d').date()

@@ -28,18 +28,16 @@ class AlertsFirefightersHandler(MyBaseHandler):
         else:
             controller = FirefightersAlertsController()
             try:
-                alert_id = self.get_argument("alert_id", "")
+                firefighter_id = self.get_argument("firefighter_id", "")
                 controller.assign_firefighter_to_alert(int(firefighter_id), int(alert_id))
                 self.set_status(201)
                 self.finish()
             except ValueError:
-                self.write("Incorrect parameters")
-                self.set_status(403)
-                self.finish()
+                raise HTTPError(400)
             except ObjectAlreadyExistsInCollectionException:
-                self.write("Firefighter is already assigned to this alert")
-                self.set_status(403)
-                self.finish()
+                raise HTTPError(303)
+            except ObjectNotFoundInDBException:
+                raise HTTPError(404)
 
     def delete(self, alert_id="", firefighter_id=""):
         if len(firefighter_id) > 0 and len(alert_id) > 0:
@@ -49,13 +47,11 @@ class AlertsFirefightersHandler(MyBaseHandler):
                 self.set_status(204)
                 self.finish()
             except ValueError:
-                self.write("Incorrect parameters")
-                self.set_status(403)
-                self.finish()
+                raise HTTPError(400)
             except ObjectNotFoundInCollectionException:
-                self.write("Firefighter is not assigned to this alert")
-                self.set_status(403)
-                self.finish()
+                raise HTTPError(404)
+            except ObjectNotFoundInDBException:
+                raise HTTPError(404)
         else:
             raise HTTPError(405)
 
